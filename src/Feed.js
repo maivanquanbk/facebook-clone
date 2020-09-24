@@ -1,14 +1,33 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Feed.css";
 import MessageSender from "./MessageSender";
 import StoryReel from "./StoryReel";
 import Post from "./Post"
+import db from './firebase';
 
 function Feed() {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    db.collection('posts').orderBy('timestamp', 'desc')
+      .onSnapshot(snapshot => {
+        setPosts(snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })))
+      })
+  }, [])
+
   return <div className="feed">
       <StoryReel />
       <MessageSender />
-      <Post 
+      {posts.map(post => (
+        <Post
+          key={post.id}
+          profilePic={post.data.profilePic}
+          message={post.data.message}
+          timestamp={post.data.timestamp}
+          username={post.data.username}
+          image={post.data.image} />
+      ))}
+      {/* <Post 
         profilePic="https://scontent-sin6-2.xx.fbcdn.net/v/t1.0-1/cp0/p80x80/117657232_3217330985053025_8666419250300903589_n.jpg?_nc_cat=110&_nc_sid=7206a8&_nc_ohc=v0LzLjMipjcAX_QrLJW&_nc_oc=AQkb2g6fHHz7HG3rHE0qie1K59icEFbjAMV01XlnBs06HFILYYuXHReOmlzvhWQTMNY&_nc_ht=scontent-sin6-2.xx&oh=ce0c0ab27b8a42155f3c42d3705845b3&oe=5F8EBFC5"
         message='Hello world!'
         timestamp="This is timestamp"
@@ -28,7 +47,7 @@ function Feed() {
         timestamp="This is timestamp"
         username="Linh"
         image="https://i.vietgiaitri.com/2019/12/4/3-hot-girl-the-he-moi-que-phu-tho-duoc-chu-y-tren-mang-xa-hoi-37d4d8.jpg"
-      />
+      /> */}
   </div>;
 }
 
